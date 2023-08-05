@@ -266,12 +266,12 @@ class NsynthDataset(abstractbasedataset.AudioDataset):
                     if instr_name not in instru_info:
                         instru_info[instr_name] = note_dict
                         instru_info[instr_name]['notes'] = [midi_note]
-                        # quality labels as np array (for easy summation). No np.int (not JSON serializable)
-                        instru_info[instr_name]['qualities'] = np.asarray(note_dict['qualities'], dtype=np.int)
+                        # quality labels as np array (for easy summation). No int (not JSON serializable)
+                        instru_info[instr_name]['qualities'] = np.asarray(note_dict['qualities'], dtype=int)
                         instru_info[instr_name]['dataset'] = [dataset_type]
                     else:  # if we met this instr before: check attributes
                         # we sum the nb of labels found across all notes
-                        instru_info[instr_name]['qualities'] += np.asarray(note_dict['qualities'], dtype=np.int)
+                        instru_info[instr_name]['qualities'] += np.asarray(note_dict['qualities'], dtype=int)
                         del note_dict['qualities']
                         for k in note_dict:  # Only a few keys remain at this point (the others were deleted already)
                             if instru_info[instr_name][k] != note_dict[k]:
@@ -283,7 +283,7 @@ class NsynthDataset(abstractbasedataset.AudioDataset):
                             instru_info[instr_name]['dataset'].append(dataset_type)
         # 'qualities' labels: transform back into a list of ints
         for k, v in instru_info.items():
-            v['qualities'] = [int(q) for q in list(v['qualities'])]  # np.int is not serializable
+            v['qualities'] = [int(q) for q in list(v['qualities'])]  # int is not serializable
         # write instru info as json
         instru_info = copy.deepcopy(instru_info)  # deepcopy to prevent serialization issues
         with open(self.data_storage_path.joinpath("instruments_info.json"), 'w') as f:

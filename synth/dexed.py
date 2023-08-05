@@ -129,7 +129,7 @@ class PresetDatabase(PresetDatabaseABC):
         self.all_presets_df.drop(columns='pickled_params_np_array', inplace=True)
         # Algorithms are also separately stored
         self._preset_algos = self.presets_mat[:, 4]
-        self._preset_algos = np.asarray(np.round(1.0 + self._preset_algos * 31.0), dtype=np.int)
+        self._preset_algos = np.asarray(np.round(1.0 + self._preset_algos * 31.0), dtype=int)
         conn.close()
 
     def _load_presets_df_multiprocess(self, conn, cur, num_workers):

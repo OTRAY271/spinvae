@@ -38,10 +38,10 @@ class Preset2dHelper:
         self._vst_param_learnable_model = ds.vst_param_learnable_model
         self._vst_idx_to_matrix_row = list()
         # np array to retrieve all vst values of a kind (num or cat) at once
-        self.vst_numerical_bool_mask = np.zeros((ds.total_nb_vst_params, ), dtype=np.bool)
-        self.vst_categorical_bool_mask = np.zeros((ds.total_nb_vst_params, ), dtype=np.bool)
+        self.vst_numerical_bool_mask = np.zeros((ds.total_nb_vst_params, ), dtype=bool)
+        self.vst_categorical_bool_mask = np.zeros((ds.total_nb_vst_params, ), dtype=bool)
         self.vst_params_card = np.asarray(
-            [ds.get_preset_param_cardinality(vst_idx) for vst_idx in range(ds.total_nb_vst_params)], dtype=np.int)
+            [ds.get_preset_param_cardinality(vst_idx) for vst_idx in range(ds.total_nb_vst_params)], dtype=int)
         # Internal arrays of indices to access the different arrays quickly
         self.fixed_vst_indices = list()
         self._matrix_row_to_vst_idx = list()
@@ -69,7 +69,7 @@ class Preset2dHelper:
                 self._vst_idx_to_matrix_row.append(None)
                 self.fixed_vst_indices.append(vst_idx)
         # Default VST param values: precompute a bool mask array and store the default values
-        self.fixed_vst_params_bool_mask = np.zeros((ds.total_nb_vst_params, ), dtype=np.bool)
+        self.fixed_vst_params_bool_mask = np.zeros((ds.total_nb_vst_params, ), dtype=bool)
         self.fixed_vst_params_default_values = -1.0 * np.ones((len(self.fixed_vst_indices, )), dtype=np.float)
         for i, vst_idx in enumerate(self.fixed_vst_indices):
             self.fixed_vst_params_bool_mask[vst_idx] = True
@@ -113,7 +113,7 @@ class Preset2dHelper:
                 np.asarray(self.matrix_categorical_rows_card) == card
         # Number of samples for each class, for each categorical group (NOT each single categorical synth param)
         self.categorical_groups_class_samples_counts = {
-            card: np.zeros((card, ), dtype=np.int) for card in categorical_cardinals_set
+            card: np.zeros((card, ), dtype=int) for card in categorical_cardinals_set
         }
         for vst_idx, class_samples_count in ds.cat_params_class_samples_count.items():
             assert self.vst_categorical_bool_mask[vst_idx]
@@ -217,7 +217,7 @@ class Preset2dHelper:
         names = np.asarray(['' for _ in range(self.n_learnable_params)], dtype=self.vst_params_names.dtype)
         names[self.matrix_categorical_bool_mask] = self.matrix_categorical_params_names
         df['cat_name'] = names
-        card_array = -10 * np.ones((self.n_learnable_params, ), dtype=np.int)
+        card_array = -10 * np.ones((self.n_learnable_params, ), dtype=int)
         for cat_idx, card in enumerate(self.matrix_categorical_rows_card):
             card_array[self.matrix_categorical_rows[cat_idx]] = card
         df['cat_card'] = card_array
@@ -226,7 +226,7 @@ class Preset2dHelper:
         names = np.asarray(['' for _ in range(self.n_learnable_params)], dtype=self.vst_params_names.dtype)
         names[self.matrix_numerical_bool_mask] = self.matrix_numerical_params_names
         df['num_name'] = names
-        card_array = -10 * np.ones((self.n_learnable_params, ), dtype=np.int)
+        card_array = -10 * np.ones((self.n_learnable_params, ), dtype=int)
         for num_idx, card in enumerate(self.matrix_numerical_rows_card):
             card_array[self.matrix_numerical_rows[num_idx]] = card
         df['num_card'] = card_array

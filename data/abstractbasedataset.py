@@ -461,7 +461,7 @@ class AudioDataset(torch.utils.data.Dataset, ABC):
     def _compute_and_store_spectrograms_and_stats_batch(self, preset_UIDs):
         """ Generates and stores spectrogram tensors, and returns a dict of spectrograms' stats
         using the given list of preset UIDs. """
-        full_stats = {'UID': np.zeros((self.nb_valid_audio_files,), dtype=np.int),
+        full_stats = {'UID': np.zeros((self.nb_valid_audio_files,), dtype=int),
                       'min': np.zeros((self.nb_valid_audio_files,)), 'max': np.zeros((self.nb_valid_audio_files,)),
                       'mean': np.zeros((self.nb_valid_audio_files,)), 'var': np.zeros((self.nb_valid_audio_files,))}
         i = 0

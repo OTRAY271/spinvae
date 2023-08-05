@@ -125,11 +125,11 @@ class DexedDataset(abstractbasedataset.PresetDataset):
         if len(self.algos) == 1:  # 1 algo: constrained constant param
             self._params_default_values[4] = (self.algos[0] - 1) / 31.0
         # cardinality 1 for constrained parameters (operators are always constrained)
-        self._params_cardinality[[44, 66, 88, 110, 132, 154]] = np.ones((6,), dtype=np.int)
+        self._params_cardinality[[44, 66, 88, 110, 132, 154]] = np.ones((6,), dtype=int)
         for op_i, op_switch_idx in enumerate([44, 66, 88, 110, 132, 154]):
             self._params_default_values[op_switch_idx] = 1.0 if ((op_i+1) in self._operators) else 0.0
         if self.constant_filter_and_tune_params:
-            self._params_cardinality[[0, 1, 2, 3]] = np.ones((4,), dtype=np.int)
+            self._params_cardinality[[0, 1, 2, 3]] = np.ones((4,), dtype=int)
             self._params_default_values[0] = 1.0  # 'cutoff'
             self._params_default_values[1] = 0.0  # 'resonance'
             self._params_default_values[2] = 1.0  # 'output' (volume)
@@ -139,7 +139,7 @@ class DexedDataset(abstractbasedataset.PresetDataset):
             self._params_default_values[13] = 0.5  # 'transpose'
         if not self.learn_mod_wheel_params:
             mod_vst_params_indexes = dexed.Dexed.get_mod_wheel_related_param_indexes()
-            self._params_cardinality[mod_vst_params_indexes] = np.ones((len(mod_vst_params_indexes),), dtype=np.int)
+            self._params_cardinality[mod_vst_params_indexes] = np.ones((len(mod_vst_params_indexes),), dtype=int)
             for vst_param_idx in mod_vst_params_indexes:
                 self._params_default_values[vst_param_idx] = 0.0  # Default: no modulation when MIDI mod wheel changes
         # - - - None / Numerical / Categorical learnable status array - - -
