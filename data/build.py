@@ -12,7 +12,7 @@ import torch.utils.data
 from torch.utils.data import DataLoader
 
 from . import dataset
-from .. import sampler
+from . import sampler
 
 
 def get_dataset(model_config, train_config):
