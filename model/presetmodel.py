@@ -6,7 +6,7 @@ from typing import Optional
 import torch
 import torch.nn as nn
 
-from data.preset2d import Preset2dHelper
+from ..data.preset2d import Preset2dHelper
 
 
 def parse_preset_model_architecture(full_architecture: str):

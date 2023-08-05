@@ -18,7 +18,7 @@ from natsort import natsorted
 from collections import OrderedDict
 from typing import Optional, List, Dict
 
-from data import abstractbasedataset
+from ..data import abstractbasedataset
 
 
 class NsynthDataset(abstractbasedataset.AudioDataset):

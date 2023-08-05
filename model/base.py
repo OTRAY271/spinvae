@@ -11,7 +11,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-import config
+from .. import config
 
 
 def build_optimizer(train_config: config.TrainConfig, lr: float, parameters):

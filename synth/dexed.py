@@ -25,10 +25,10 @@ import sqlite3
 import io
 import pandas as pd
 
-import synth.dexedbase
+from ..synth import dexedbase
 import librenderman as rm  # A symbolic link to the actual librenderman.so must be found in the current folder
 
-import utils.text
+from ..utils import text
 
 
 # Pickled numpy arrays storage in sqlite3 DB
@@ -371,7 +371,7 @@ class PresetDfDatabase(PresetDatabaseABC):
 
 
 
-class Dexed(synth.dexedbase.DexedCharacteristics):
+class Dexed(dexedbase.DexedCharacteristics):
     """ A Dexed (DX7) synth that can be used through RenderMan for offline wav rendering. """
 
     def __init__(self, output_Fs, render_Fs=48000,
@@ -393,7 +393,7 @@ class Dexed(synth.dexedbase.DexedCharacteristics):
         self.fft_size = fft_size  # FFT not used
 
         self.engine = rm.RenderEngine(self.render_Fs, self.buffer_size, self.fft_size)
-        with utils.text.hidden_prints(filter_stderr=True) if filter_plugin_loading_errors else None:
+        with text.hidden_prints(filter_stderr=True) if filter_plugin_loading_errors else None:
             self.engine.load_plugin(self.plugin_path)  # filter the "No protocol specified" double error msg
 
         # A generator preset is a list of (int, float) tuples.
@@ -429,7 +429,7 @@ class Dexed(synth.dexedbase.DexedCharacteristics):
     def assign_random_preset_short_release(self):
         """ Generates a random preset with a short release time - to ensure a limited-duration
          audio recording, and configures the rendering engine to use that preset. """
-        self.current_preset = dexed.preset_gen.get_random_patch()
+        self.current_preset = preset_gen.get_random_patch()
         self.set_release_short()
         self.engine.set_patch(self.current_preset)
 

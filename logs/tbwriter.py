@@ -8,7 +8,7 @@ from torch.utils.tensorboard.summary import hparams
 
 from .metrics import BufferedMetric, LatentMetric, VectorMetric
 
-import utils.stat
+from ..utils import stat
 
 
 # TODO check if this mod remains necessary with PyTorch 1.10
@@ -132,7 +132,7 @@ class TensorboardSummaryWriter(CorrectedSummaryWriter):
         self.add_histogram(metric_name, data, global_step=global_step, bins=bins)
         if '/' in metric_name:
             no_outlier_name = metric_name.replace('/', '_no_outlier/')
-            self.add_histogram(no_outlier_name, utils.stat.remove_outliers(data), global_step=global_step, bins=bins)
+            self.add_histogram(no_outlier_name, stat.remove_outliers(data), global_step=global_step, bins=bins)
         else:
             warnings.warn("Metric name '{}' does not contain a dataset type (e.g. /Train or /Validation)"
                           .format(metric_name))
@@ -148,9 +148,9 @@ class TensorboardSummaryWriter(CorrectedSummaryWriter):
         self.add_histogram("z0/{}".format(dataset_type), z0, global_step=global_step, bins=bins)
         self.add_histogram("zK/{}".format(dataset_type), zK, global_step=global_step, bins=bins)
         # also add no-outlier histograms (the other ones are actually unreadable...)
-        self.add_histogram("z0/{}_no_outlier".format(dataset_type), utils.stat.remove_outliers(z0),
+        self.add_histogram("z0/{}_no_outlier".format(dataset_type), stat.remove_outliers(z0),
                            global_step=global_step, bins=bins)
-        self.add_histogram("zK/{}_no_outlier".format(dataset_type), utils.stat.remove_outliers(zK),
+        self.add_histogram("zK/{}_no_outlier".format(dataset_type), stat.remove_outliers(zK),
                            global_step=global_step, bins=bins)
 
     def add_latent_embedding(self, latent_metric: LatentMetric, dataset_type: str, global_step: int):

@@ -19,7 +19,7 @@ import numpy as np
 import torch
 import torch.nn.functional
 
-import synth.dexed
+from ..synth import dexed
 
 
 # Should be used instead of the str synth name to reduce loss functions computation times
@@ -346,7 +346,7 @@ class PresetIndexesHelper:
                 raise AssertionError("Dexed feedback is not a learnable parameter.")
             # Now, we can compute the symmetric duplicates
             # List of (algos, operators permutations) tuples
-            permutations = [synth.dexed.Dexed.get_algorithms_and_oscillators_permutations(u_in_algos[i], u_in_feedback[i])
+            permutations = [dexed.Dexed.get_algorithms_and_oscillators_permutations(u_in_algos[i], u_in_feedback[i])
                             for i in range(u_in_algos.shape[0])]
             all_algos_permutations = np.hstack([permutations[i][0] for i in range(len(permutations))])
             permutations_groups = list()
@@ -377,7 +377,7 @@ class PresetIndexesHelper:
                         learnable_indexes = [learnable_indexes]
                     unchanged_learn_indices += learnable_indexes
             # pre-compute groups of param indexes for each operator
-            op_params_vst_ranges = synth.dexed.Dexed.get_operators_params_indexes_groups()
+            op_params_vst_ranges = dexed.Dexed.get_operators_params_indexes_groups()
             op_params_ranges = [self.vst_indices_range_to_learnable_range(r) for r in op_params_vst_ranges]
             for old_preset_idx, new_preset_range in enumerate(permutations_groups):
                 # 2b) copy values of general parameters (e.g. feedback, LFO, main pitch, ...)

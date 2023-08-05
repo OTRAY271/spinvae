@@ -10,7 +10,7 @@ import soundfile
 import torch
 from matplotlib import pyplot as plt
 
-import utils.figures
+from ..utils import figures
 
 
 class InterpSequence:
@@ -46,7 +46,7 @@ class InterpSequence:
                             audio_Fs[0], audio_Fs[1], subtype='FLOAT')
         with open(self.storage_path.joinpath('spectrograms.pkl'), 'wb') as f:
             pickle.dump(self.spectrograms, f)
-        fig, axes = utils.figures.plot_spectrograms_interp(
+        fig, axes = figures.plot_spectrograms_interp(
             self.u, torch.vstack([torch.unsqueeze(torch.unsqueeze(s, dim=0), dim=0) for s in self.spectrograms]),
             plot_delta_spectrograms=False, title=(self.name if len(self.name) > 0 else None)
         )

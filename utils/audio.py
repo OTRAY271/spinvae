@@ -16,7 +16,7 @@ import librosa
 import librosa.display
 import soundfile as sf
 
-from data.abstractbasedataset import AudioDataset
+from ..data.abstractbasedataset import AudioDataset
 
 
 class SimilarityEvaluator:

@@ -6,13 +6,13 @@ from typing import List
 import editdistance  # levenshtein edit distance
 import numpy as np
 
-from data.abstractbasedataset import AudioDataset
-from data.dexeddataset import DexedDataset
-from data.dataset import NsynthDataset
+from ..data.abstractbasedataset import AudioDataset
+from ..data.dexeddataset import DexedDataset
+from ..data.dataset import NsynthDataset
 
 
 # TODO maybe use enums to go faster?
-from data.surgedataset import SurgeDataset
+from ..data.surgedataset import SurgeDataset
 
 _label_reference_strings = {
     # Pluck is another label

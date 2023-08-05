@@ -12,13 +12,13 @@ from datetime import datetime
 
 import config
 
-from data import dataset
-from data.dataset import SurgeDataset, NsynthDataset, DexedDataset
-from data.abstractbasedataset import AudioDataset
+from ..data import dataset
+from ..data.dataset import SurgeDataset, NsynthDataset, DexedDataset
+from ..data.abstractbasedataset import AudioDataset
 
-import synth.surge  # To re-generate the list of patches (included in the synth itself)
+from ..synth import surge  # To re-generate the list of patches (included in the synth itself)
 
-import utils.label
+from ..utils import label
 
 
 
@@ -60,7 +60,7 @@ def gen_dexed_dataset(regen_wav: bool, regen_spectrograms: bool, regen_learnable
         dexed_dataset.compute_and_store_learnable_presets()
     _gen_dataset(dexed_dataset, regen_wav, regen_spectrograms)
     if regen_labels:  # Instruments labels only
-        labeler = utils.label.NameBasedLabeler(dexed_dataset)
+        labeler = label.NameBasedLabeler(dexed_dataset)
         labeler.extract_labels(verbose=True)
         print(labeler)
         dexed_dataset.save_labels(labeler.instrument_labels, labeler.labels_per_UID)
@@ -87,14 +87,14 @@ def gen_surge_dataset(regen_patches_list: bool, regen_wav: bool, regen_spectrogr
     importlib.reload(config)
 
     if regen_patches_list:
-        synth.surge.Surge.update_patches_list()
+        surge.Surge.update_patches_list()
 
     # No label restriction, etc... FIXME also regenerate JSON patches list
     surge_dataset = SurgeDataset(** dataset.model_config_to_dataset_kwargs(config.model),
                                  data_augmentation=True,
                                  check_consistency=(not regen_wav) and (not regen_spectrograms))
     if regen_labels:  # Instruments labels only
-        labeler = utils.label.SurgeReLabeler(surge_dataset)
+        labeler = label.SurgeReLabeler(surge_dataset)
         labeler.extract_labels(verbose=True)
         print(labeler)
         surge_dataset.save_labels(labeler.instrument_labels, labeler.labels_per_UID)
@@ -135,7 +135,7 @@ def gen_nsynth_dataset(regen_json: bool, regen_spectrograms: bool, regen_labels:
         nsynth_dataset.regenerate_json_and_symlinks()
     _gen_dataset(nsynth_dataset, False, regen_spectrograms)
     if regen_labels:  # Instruments labels only
-        labeler = utils.label.NSynthReLabeler(nsynth_dataset)
+        labeler = label.NSynthReLabeler(nsynth_dataset)
         labeler.extract_labels(verbose=True)
         print(labeler)
         nsynth_dataset.save_labels(labeler.instrument_labels, labeler.labels_per_UID)

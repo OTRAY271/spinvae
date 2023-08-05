@@ -5,8 +5,8 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-import config
-from model.hierarchicalvae import HierarchicalVAE
+from .. import config
+from ..model.hierarchicalvae import HierarchicalVAE
 
 
 class TestFlattenUnflattenLatentValues(unittest.TestCase):

@@ -7,8 +7,8 @@ import torch
 import torch.nn as nn
 import torchinfo
 
-from data.preset2d import Preset2dHelper
-from model.presetmodel import parse_preset_model_architecture, PresetEmbedding, get_act, get_transformer_act
+from ..data.preset2d import Preset2dHelper
+from ..model.presetmodel import parse_preset_model_architecture, PresetEmbedding, get_act, get_transformer_act
 
 
 class PresetEncoder(nn.Module):

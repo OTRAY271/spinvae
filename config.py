@@ -20,7 +20,7 @@ import pathlib
 # It must contain the following fields:
 #     data_root_path, logs_root_dir,
 #     comet_api_key, comet_project_name, comet_workspace
-from utils import config_confidential
+from .utils import config_confidential
 
 
 # ===================================================================================================================

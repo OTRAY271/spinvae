@@ -19,8 +19,8 @@ import torchaudio
 import soundfile
 from natsort import natsorted
 
-from data import abstractbasedataset
-from synth import surge
+from ..data import abstractbasedataset
+from ..synth import surge
 
 
 class SurgeDataset(abstractbasedataset.AudioDataset):

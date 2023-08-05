@@ -6,7 +6,7 @@ import copy
 from pathlib import Path
 from typing import List, Dict, Union, Any, Optional
 
-from utils import config_confidential
+from .utils import config_confidential
 
 
 class InterpEvalConfig:

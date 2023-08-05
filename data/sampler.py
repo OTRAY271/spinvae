@@ -11,7 +11,7 @@ import numpy as np
 import torch
 import torch.utils.data
 
-from data.abstractbasedataset import AudioDataset
+from ..data.abstractbasedataset import AudioDataset
 
 
 _SEED_OFFSET = 6357396522630986725  # because PyTorch recommends to use a seed "with a lot of 0 and 1 bits"

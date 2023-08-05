@@ -9,15 +9,15 @@ from torch import nn
 import torch.nn.functional as F
 from torch.distributions.normal import Normal
 
-import config
-import model.base
-import model.ladderbase
-import model.ladderencoder
-import model.ladderdecoder
-import utils.probability
-from data.preset2d import Preset2dHelper
-from utils.probability import gaussian_log_probability, standard_gaussian_log_probability, MMD
-import utils.exception
+from .. import config
+from ..model import base
+from ..model import ladderbase
+from ..model import ladderencoder
+from ..model import ladderdecoder
+from ..utils import probability
+from ..data.preset2d import Preset2dHelper
+from ..utils.probability import gaussian_log_probability, standard_gaussian_log_probability, MMD
+from ..utils import exception
 
 
 def parse_latent_extract_architecture(full_architecture: str):
@@ -78,7 +78,7 @@ class HierarchicalVAEOutputs:
         return t.clone().detach().cpu().numpy()
 
 
-class HierarchicalVAE(model.base.TrainableMultiGroupModel):
+class HierarchicalVAE(base.TrainableMultiGroupModel):
     def __init__(self, model_config: config.ModelConfig, train_config: Optional[config.TrainConfig] = None,
                  preset_helper: Optional[Preset2dHelper] = None):
         """
@@ -100,7 +100,7 @@ class HierarchicalVAE(model.base.TrainableMultiGroupModel):
         self.beta_warmup_ongoing = train_config.beta_warmup_epochs > 0  # Will be modified when warmup has ended
 
         # Pre-process configuration
-        self.main_conv_arch = model.ladderbase.parse_main_conv_architecture(model_config.vae_main_conv_architecture)
+        self.main_conv_arch = ladderbase.parse_main_conv_architecture(model_config.vae_main_conv_architecture)
         self.latent_arch = parse_latent_extract_architecture(model_config.vae_latent_extract_architecture)
         self.preset_ae_method = model_config.preset_ae_method
         self._alignment_criterion = train_config.preset_alignment_criterion
@@ -130,7 +130,7 @@ class HierarchicalVAE(model.base.TrainableMultiGroupModel):
                                 preset_helper,
                                 train_config.preset_internal_dropout)
             dummy_u = preset_helper.get_null_learnable_preset(train_config.minibatch_size)
-        self.encoder = model.ladderencoder.LadderEncoder(
+        self.encoder = ladderencoder.LadderEncoder(
             self.main_conv_arch, self.latent_arch, model_config.vae_latent_levels, model_config.input_audio_tensor_size,
             model_config.approx_requested_dim_z,
             *encoder_opt_args
@@ -156,7 +156,7 @@ class HierarchicalVAE(model.base.TrainableMultiGroupModel):
                                 train_config.preset_CE_label_smoothing,
                                 train_config.preset_CE_use_weights,
                                 train_config.params_loss_exclude_useless)
-        self.decoder = model.ladderdecoder.LadderDecoder(
+        self.decoder = ladderdecoder.LadderDecoder(
             self.main_conv_arch, self.latent_arch,
             self.z_shapes, model_config.input_audio_tensor_size,
             model_config.audio_decoder_distribution,
@@ -294,7 +294,7 @@ class HierarchicalVAE(model.base.TrainableMultiGroupModel):
             # Dkl for a batch item is the sum of per-coordinates Dkls
             # We don't normalize (divide by the latent size) to stay closer to the ELBO when the latent size is changed.
             if np.isclose(self._latent_free_bits, 0.0):
-                z_losses_per_lvl.append(utils.probability.standard_gaussian_dkl(
+                z_losses_per_lvl.append(probability.standard_gaussian_dkl(
                     z_mu[lat_lvl].flatten(start_dim=1), z_var[lat_lvl].flatten(start_dim=1), reduction='mean'))
             else:
                 # "Free bits" constraint is applied to each channel
@@ -304,7 +304,7 @@ class HierarchicalVAE(model.base.TrainableMultiGroupModel):
                     self._latent_free_bits * np.prod(z_mu[lat_lvl].shape[2:]),
                     dtype=z_mu[lat_lvl].dtype, device=z_mu[lat_lvl].device)
                 # Average over batch dimension (not over pixels dimensions), but keep the channels dim
-                dkl_per_ch = utils.probability.standard_gaussian_dkl_2d(
+                dkl_per_ch = probability.standard_gaussian_dkl_2d(
                     z_mu[lat_lvl], z_var[lat_lvl], dim=(2, 3), reduction='mean')
                 dkl_per_ch = torch.maximum(dkl_per_ch, min_dkl)  # Free-bits constraint
                 # Sum Dkls from all channels (overall diagonal gaussian prior)
@@ -336,9 +336,9 @@ class HierarchicalVAE(model.base.TrainableMultiGroupModel):
             mu_preset = self.flatten_latent_values(ae_out_preset.z_mu)
             var_preset = self.flatten_latent_values(ae_out_preset.z_var)
             if self._alignment_criterion == 'kld':  # KLD ( q(z|preset) || q(z|audio) )
-                loss = utils.probability.gaussian_dkl(mu_preset, var_preset, mu_audio, var_audio, reduction='mean')
+                loss = probability.gaussian_dkl(mu_preset, var_preset, mu_audio, var_audio, reduction='mean')
             elif self._alignment_criterion == 'symmetric_kld':
-                loss = utils.probability.symmetric_gaussian_dkl(
+                loss = probability.symmetric_gaussian_dkl(
                     mu_preset, var_preset, mu_audio, var_audio, reduction='mean')
             # TODO implement 2-Wasserstein distance (and MMD?)
             else:
@@ -469,7 +469,7 @@ def process_minibatch(
             scalars['VAELoss/Backprop' + suffix].append(audio_log_prob_loss + lat_backprop_loss)
 
     if training:
-        utils.exception.check_nan_values(
+        exception.check_nan_values(
             epoch, audio_log_prob_loss, lat_backprop_loss, align_loss, preset_loss, preset_reg_loss)
         # Backprop and optimizers' step (before schedulers' step)
         (audio_log_prob_loss + lat_backprop_loss + align_loss + preset_loss + preset_reg_loss).backward()

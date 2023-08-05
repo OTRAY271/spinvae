@@ -7,10 +7,10 @@ import warnings
 from torch import nn as nn
 from torch.nn import functional as F
 
-from data.preset2d import Preset2dHelper
-from model.presetmodel import parse_preset_model_architecture, get_act, PresetEmbedding, get_transformer_act
-from synth.dexedbase import DexedCharacteristics
-from utils.probability import GaussianUnitVariance, DiscretizedLogisticMixture, SoftmaxNumerical
+from ..data.preset2d import Preset2dHelper
+from ..model.presetmodel import parse_preset_model_architecture, get_act, PresetEmbedding, get_transformer_act
+from ..synth.dexedbase import DexedCharacteristics
+from ..utils.probability import GaussianUnitVariance, DiscretizedLogisticMixture, SoftmaxNumerical
 
 
 class PresetDecoder(nn.Module):

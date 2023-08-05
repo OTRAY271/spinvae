@@ -10,18 +10,18 @@ import numpy as np
 import scipy.interpolate
 import torch
 
-import data.abstractbasedataset
-import data.build
-import utils.probability
-from data.preset2d import Preset2dHelper, Preset2d
+from ..data import abstractbasedataset
+from ..data import build
+from ..utils import probability
+from ..data.preset2d import Preset2dHelper, Preset2d
 
-import evaluation.load
-import evaluation.interpbase
+from ..evaluation import load
+from ..evaluation import interpbase
 
 
 
-class LatentInterpolation(evaluation.interpbase.ModelBasedInterpolation):
-    def __init__(self, model_loader: Optional[evaluation.load.ModelLoader] = None,
+class LatentInterpolation(interpbase.ModelBasedInterpolation):
+    def __init__(self, model_loader: Optional[load.ModelLoader] = None,
                  num_steps=7, device='cpu',
                  latent_interp='linear',
                  generator=None, init_generator=True,
@@ -80,8 +80,8 @@ class LatentInterpolation(evaluation.interpbase.ModelBasedInterpolation):
         raise NotImplementedError()
 
 
-class SynthPresetLatentInterpolation(evaluation.interpbase.ModelBasedInterpolation):
-    def __init__(self, model_loader: evaluation.load.ModelLoader, num_steps=7,
+class SynthPresetLatentInterpolation(interpbase.ModelBasedInterpolation):
+    def __init__(self, model_loader: load.ModelLoader, num_steps=7,
                  u_curve='linear', latent_interp='linear', refine_level=0,
                  storage_path: Optional[pathlib.Path] = None, reference_storage_path: Optional[pathlib.Path] = None,
                  verbose=True, verbose_postproc=True,
@@ -97,7 +97,7 @@ class SynthPresetLatentInterpolation(evaluation.interpbase.ModelBasedInterpolati
             verbose=verbose, verbose_postproc=verbose_postproc, **kwargs
         )
         self.refine_level = refine_level
-        if not isinstance(self.dataset, data.abstractbasedataset.PresetDataset):
+        if not isinstance(self.dataset, abstractbasedataset.PresetDataset):
             raise NotImplementedError("This evaluation class is available for a PresetDataset only (current "
                                       "self.dataset type: {})".format(type(self.dataset)))
 
@@ -153,7 +153,7 @@ class SynthPresetLatentInterpolation(evaluation.interpbase.ModelBasedInterpolati
 
                     # TODO compute log-prob under the VAE-encoded gaussian distrib q(z | x, v)
                     # Ensures that latent codes remains highly log-probable under the posterior distribution
-                    z_NLL_initial_distribution = - utils.probability.gaussian_log_probability(
+                    z_NLL_initial_distribution = - probability.gaussian_log_probability(
                         z_flat, z_mu_first_guess_flat, z_logvar_first_guess_flat, add_log_2pi_term=True)
                     z_NLL_initial_distribution = z_NLL_initial_distribution / z_flat.shape[1]
 

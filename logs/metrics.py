@@ -10,7 +10,7 @@ import scipy.stats
 
 import torch
 
-from model.hierarchicalvae import HierarchicalVAEOutputs
+from ..model.hierarchicalvae import HierarchicalVAEOutputs
 
 
 class BufferedMetric:

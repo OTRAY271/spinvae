@@ -12,7 +12,7 @@ import torch.utils.data
 from torch.utils.data import DataLoader
 
 from . import dataset
-import data.sampler
+from .. import sampler
 
 
 def get_dataset(model_config, train_config):
@@ -63,7 +63,7 @@ def get_split_dataloaders(train_config, full_dataset,
     if num_workers is None:
         num_workers = get_num_workers(train_config)
     # Dataloader easily build from samplers
-    subset_samplers = data.sampler.build_subset_samplers(full_dataset, k_fold=train_config.current_k_fold,
+    subset_samplers = sampler.build_subset_samplers(full_dataset, k_fold=train_config.current_k_fold,
                                                          k_folds_count=train_config.k_folds,
                                                          test_holdout_proportion=train_config.test_holdout_proportion)
     dataloaders = dict()

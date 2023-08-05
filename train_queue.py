@@ -16,9 +16,9 @@ import gc
 
 import torch
 
-import config
-import train
-import utils.exception
+from . import config
+from . import train
+from .utils import exception
 
 
 # TODO intercept Ctrl-C sigint and ask for confirmation
@@ -125,7 +125,7 @@ if __name__ == "__main__":
             try:  # - - - - - Model train - - - - -
                 train.train_model(model_config, train_config)
                 has_finished_training = True
-            except utils.exception.ModelConvergenceError as e:
+            except exception.ModelConvergenceError as e:
                 divergent_model_runs += 1
                 if divergent_model_runs <= max_divergent_model_runs:
                     print("[train_queue.py] Model train did not converge: {}. Restarting run... (next trial: {}/{})"
@@ -135,7 +135,7 @@ if __name__ == "__main__":
                     e_str = "Model training run {}/{} does not converge ({} run trials failed). " \
                             "Training queue will now stop, please check this convergence problem."\
                         .format(run_index+1, len(model_config_mods), divergent_model_runs)
-                    raise utils.exception.ModelConvergenceError(e_str)
+                    raise exception.ModelConvergenceError(e_str)
 
         print("=============== Enqueued Training Run {}/{} has finished ==============="
               .format(run_index+1, len(model_config_mods)))

@@ -7,7 +7,7 @@ from typing import Tuple
 
 import torch
 
-import config
+from .. import config
 from . import dexeddataset
 from . import surgedataset
 from . import nsynthdataset

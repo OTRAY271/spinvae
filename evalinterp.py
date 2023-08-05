@@ -8,11 +8,11 @@ from contextlib import redirect_stdout
 from datetime import datetime
 from multiprocessing import Process
 
-from evalconfig import InterpEvalConfig
-from evaluation.load import ModelLoader
-from evaluation.interpbase import NaivePresetInterpolation
-from evaluation.interp import SynthPresetLatentInterpolation
-import utils.text
+from .evalconfig import InterpEvalConfig
+from .evaluation.load import ModelLoader
+from .evaluation.interpbase import NaivePresetInterpolation
+from .evaluation.interp import SynthPresetLatentInterpolation
+from .utils import text
 
 
 def run(eval_config: InterpEvalConfig):
@@ -112,7 +112,7 @@ def eval_single_model(base_model_name: str, dataset_type='validation'):
 def _eval_single_model_process(eval_config: InterpEvalConfig, add_prefix_to_prints=False):
     assert len(eval_config.other_models) == 1
     m_config = eval_config.other_models[0]
-    with redirect_stdout(utils.text.StdOutPrefixAdder("[[Evaluation: {}]] ".format(m_config['base_model_name'])
+    with redirect_stdout(text.StdOutPrefixAdder("[[Evaluation: {}]] ".format(m_config['base_model_name'])
                                                       if add_prefix_to_prints else "")):
         preset_interpolator = get_preset_interpolator(m_config, eval_config)
         was_processed = preset_interpolator.try_process_dataset(True, eval_config.skip_audio_render)

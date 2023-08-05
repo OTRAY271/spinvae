@@ -19,16 +19,16 @@ import torchinfo
 
 import humanize
 
-import config
-from data.abstractbasedataset import AudioDataset
-import model.base
-import utils
-import utils.figures
-import utils.stat
-import model.hierarchicalvae
+from .. import config
+from ..data.abstractbasedataset import AudioDataset
+from ..model import base
+from .. import utils
+from ..utils import figures
+from ..utils import stat
+from ..model import hierarchicalvae
 from .tbwriter import TensorboardSummaryWriter  # Custom modified summary writer
 from .cometwriter import CometWriter
-import logs.logger_mp
+from ..logs import logger_mp
 
 _erase_security_time_s = 5.0
 
@@ -291,16 +291,16 @@ class RunLogger:
     # - - - - - - - - - - Non-threaded plots to comet/tensorbard - - - - - - - - - -
 
     def plot_spectrograms(self, x_in, x_out, uid, notes, dataset: AudioDataset, name='Spectrogram/Valid'):
-        fig, _ = utils.figures.plot_train_spectrograms(
+        fig, _ = figures.plot_train_spectrograms(
             x_in, x_out, uid, notes, dataset, self.model_config, self.train_config)
         self.add_figure(name, fig)
 
-    def plot_decoder_interpolation(self, h_vae: model.hierarchicalvae.HierarchicalVAE,
+    def plot_decoder_interpolation(self, h_vae: hierarchicalvae.HierarchicalVAE,
                                    z_minibatch, preset_UIDs, dataset: AudioDataset,
                                    audio_channel=0, name='AudioDecoderInterp/Valid'):
         # "CUDA illegal memory access (stacktrace might be incorrect)" - seems to be fixed by torch 1.10, CUDA 11.3
         from evaluation.interp import LatentInterpolation  # local import to prevent circular import
-        generative_model = model.hierarchicalvae.AudioDecoder(h_vae)
+        generative_model = hierarchicalvae.AudioDecoder(h_vae)
         interpolator = LatentInterpolation(generator=generative_model, device=z_minibatch.device)
         # z start/end tensors must be be provided as 1 x D vectors
         u, z, x = interpolator.interpolate_spectrograms_from_latent(z_minibatch[0:1, :], z_minibatch[1:2, :])
@@ -308,7 +308,7 @@ class RunLogger:
             x = x[:, audio_channel:audio_channel + 1, :, :]
         preset_names = [dataset.get_name_from_preset_UID(UID.item()) for UID in preset_UIDs[0:2]]  # FIXME
         title = "{} '{}' ----> {} '{}'".format(preset_UIDs[0], preset_names[0], preset_UIDs[1], preset_names[1])
-        fig, _ = utils.figures.plot_spectrograms_interp(u, x, z=z, title=title, plot_delta_spectrograms=True)
+        fig, _ = figures.plot_spectrograms_interp(u, x, z=z, title=title, plot_delta_spectrograms=True)
         self.add_figure(name, fig)
 
     # - - - - - Multi threaded + multiprocessing plots to comet/tensorboard - - - - -
@@ -351,7 +351,7 @@ class RunLogger:
 
         # Asynchronous (delayed) plots: epoch and step are probably different from the current (self.) ones
         if not self.use_multiprocessing:
-            figs_dict = logs.logger_mp.get_stats_figures(super_metrics, networks_layers_params)
+            figs_dict = logger_mp.get_stats_figures(super_metrics, networks_layers_params)
         else:
             # 'spawn' context is slower, but solves observed deadlock
             #     - deadlock seems to be caused by serializing this instance
@@ -359,7 +359,7 @@ class RunLogger:
             #       The parent process starts a fresh python interpreter process
             ctx = multiprocessing.get_context('spawn')  # ctx used instead of multiproc
             q = ctx.Queue()
-            p = ctx.Process(target=logs.logger_mp.get_stats_figs__multiproc,
+            p = ctx.Process(target=logger_mp.get_stats_figs__multiproc,
                             args=(q, super_metrics, networks_layers_params))
             p.start()
             figs_dict = q.get()  # Will block until an item is available
@@ -405,7 +405,7 @@ class RunLogger:
                         # Default bins estimator: 'tensorflow'. Other estimator: 'fd' (robust for outliers)
                         self.tensorboard.add_histogram(name, param_values, epoch)
                         self.tensorboard.add_histogram('{}_no_outlier/{}/{}'.format(network_name, layer_name, param_name),
-                                                       utils.stat.remove_outliers(param_values), epoch)
+                                                       stat.remove_outliers(param_values), epoch)
                     if self.comet is not None:
                         self.comet.experiment.log_histogram_3d(param_values, name, step=step, epoch=epoch)
 

@@ -7,11 +7,11 @@ import torch.nn.functional as F
 import torchinfo
 import warnings
 
-import model.presetencoder
-from model.ladderbase import LadderBase
-from model.convlayer import ConvBlock2D, DownsamplingResBlock, SelfAttentionConv2D
-from model.convlstm import ConvLSTM
-from data.preset2d import Preset2d, Preset2dHelper
+from ..model import presetencoder
+from ..model.ladderbase import LadderBase
+from ..model.convlayer import ConvBlock2D, DownsamplingResBlock, SelfAttentionConv2D
+from ..model.convlstm import ConvLSTM
+from ..data.preset2d import Preset2d, Preset2dHelper
 
 
 class LadderEncoder(LadderBase):
@@ -147,7 +147,7 @@ class LadderEncoder(LadderBase):
             else:
                 raise ValueError("model_config.vae_preset_encode_add must be either 'before_latent_cell' or "
                                  "'after_latent_cell' (current: '{}')".format(preset_encode_add))
-            self.preset_encoder = model.presetencoder.PresetEncoder(
+            self.preset_encoder = presetencoder.PresetEncoder(
                 preset_architecture, preset_hidden_size, preset_helper,
                 dim_z, encoded_preset_fm_shape, preset_dropout_p
             )

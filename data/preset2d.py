@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from synth.dexedbase import DexedCharacteristics
+from ..synth.dexedbase import DexedCharacteristics
 from .abstractbasedataset import PresetDataset
 
 

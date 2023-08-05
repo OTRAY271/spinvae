@@ -15,13 +15,13 @@ import torch
 import torch.nn.functional as F
 from sklearn.metrics import confusion_matrix
 
-import logs.metrics
+from ..logs import metrics
 
-from data.abstractbasedataset import AudioDataset, PresetDataset
-from data.preset import PresetIndexesHelper
-from data.preset2d import Preset2d, Preset2dHelper
+from ..data.abstractbasedataset import AudioDataset, PresetDataset
+from ..data.preset import PresetIndexesHelper
+from ..data.preset2d import Preset2d, Preset2dHelper
 
-import utils.stat
+from ..utils import stat
 
 
 # Display parameters for scatter/box/error plots
@@ -297,7 +297,7 @@ def plot_spectrograms_interp(
     return fig, axes
 
 
-def plot_vector_distributions_stats(metrics: Dict[str, logs.metrics.VectorMetric], metric_name: str):
+def plot_vector_distributions_stats(metrics: Dict[str, metrics.VectorMetric], metric_name: str):
     """
 
     :param metrics:
@@ -319,7 +319,7 @@ def plot_vector_distributions_stats(metrics: Dict[str, logs.metrics.VectorMetric
         axes[row, 0].boxplot(x=data[ds_type].flatten(), vert=True, sym='.k', flierprops=flierprops)
         axes[row, 0].set(ylabel=ds_type, title="All datapoints")
         # plot flattened data, without outliers
-        axes[row, 1].hist(x=utils.stat.remove_outliers(data[ds_type].flatten()), orientation='horizontal', bins=25)
+        axes[row, 1].hist(x=stat.remove_outliers(data[ds_type].flatten()), orientation='horizontal', bins=25)
         axes[row, 1].set(title="(w/o outliers)")
         # plot the 50 first per-coordinate output distributions
         sns.violinplot(data=data[ds_type][:, 0:num_coord_to_plot], ax=axes[row, 2], inner='quartile',
@@ -333,7 +333,7 @@ def plot_vector_distributions_stats(metrics: Dict[str, logs.metrics.VectorMetric
     return fig, axes
 
 
-def plot_latent_distributions_stats(latent_metric: logs.metrics.LatentMetric, figsize=None, eps=1e-7,
+def plot_latent_distributions_stats(latent_metric: metrics.LatentMetric, figsize=None, eps=1e-7,
                                     max_displayed_latent_coords=140):
     """ Uses boxplots to represent the distribution of the mu and/or sigma parameters of
     latent gaussian distributions. Also plots a general histogram of all samples.
@@ -355,10 +355,10 @@ def plot_latent_distributions_stats(latent_metric: logs.metrics.LatentMetric, fi
         data_flat[k] = latent_data.flatten()
         # Increased outliers display (IQR factor default value was 1.5) to be able to observe posterior collapse
         IQR_factor = max(1.5, 2.0 * np.log(dim_z) - 5.0)
-        outlier_limits[k] = utils.stat.get_outliers_bounds(data_flat[k], IQR_factor=IQR_factor)
+        outlier_limits[k] = stat.get_outliers_bounds(data_flat[k], IQR_factor=IQR_factor)
         outlier_limits[k] = (outlier_limits[k][0] - eps, outlier_limits[k][1] + eps)
         # get a subset if too large - otherwise the figured is rendered to 160MB (!!!) SVG files for dim_z = 2000
-        data_flat[k] = utils.stat.get_random_subset_keep_minmax(data_flat[k], latent_data.shape[0] * 10)
+        data_flat[k] = stat.get_random_subset_keep_minmax(data_flat[k], latent_data.shape[0] * 10)
 
         # FIXME build 2 tables of data_limited
         if i == 0:  # Build indices when processing the very first metric
@@ -411,7 +411,7 @@ def plot_latent_distributions_stats(latent_metric: logs.metrics.LatentMetric, fi
     return fig, axes
 
 
-def plot_spearman_correlation(latent_metric: logs.metrics.LatentMetric):
+def plot_spearman_correlation(latent_metric: metrics.LatentMetric):
     """ Plots the spearman correlation matrix (full, and with zeroed diagonal)
     and returns fig, axes """
     # http://jkimmel.net/disentangling_a_latent_space/ : Uncorrelated (independent) latent variables are necessary
@@ -453,7 +453,7 @@ def plot_network_parameters(network_params: Dict[str, Dict[str, np.ndarray]]):
         for param_name, param_values in layer_params.items():
             color = 'C{}'.format(layer_idx % 10)
             sns.violinplot(x=param_values, ax=axes[layer_idx*2, param_idx], color=color)
-            sns.violinplot(x=utils.stat.remove_outliers(param_values), ax=axes[layer_idx*2 + 1, param_idx], color=color)
+            sns.violinplot(x=stat.remove_outliers(param_values), ax=axes[layer_idx*2 + 1, param_idx], color=color)
             axes[layer_idx * 2, param_idx].grid(axis='x', linestyle='-')
             axes[layer_idx * 2 + 1, param_idx].grid(axis='x', linestyle='-')
             if layer_idx == 0:
@@ -742,7 +742,7 @@ if __name__ == "__main__":
 
     # Latent Metric plot tests - filled with artificial values
     dim_z = 256
-    latent_metrics = logs.metrics.LatentMetric(dim_z, 1000)  # dim_z is the 2nd dim in the hidden data member
+    latent_metrics = metrics.LatentMetric(dim_z, 1000)  # dim_z is the 2nd dim in the hidden data member
     for k in ['mu', 'sigma', 'zK']:
         latent_metrics._z[k] = np.random.normal(0.0, 1.0, (1000, dim_z))
     latent_metrics._z['sigma'] = 1.0 / (1.0 + np.exp(latent_metrics._z['sigma']))

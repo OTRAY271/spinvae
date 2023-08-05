@@ -7,7 +7,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 
-from data.dataset import DexedDataset
+from ..data.dataset import DexedDataset
 
 
 class TestDexedDatasetLoader:

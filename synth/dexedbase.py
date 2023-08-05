@@ -6,7 +6,7 @@ from typing import List
 
 import numpy as np
 
-import synth.dexedpermutations
+from ..synth import dexedpermutations
 
 
 class DexedCharacteristics:
@@ -151,7 +151,7 @@ class DexedCharacteristics:
 
     @staticmethod
     def get_algorithms_and_oscillators_permutations(algo: int, feedback: bool):
-        return synth.dexedpermutations.get_algorithms_and_oscillators_permutations(algo, feedback)
+        return dexedpermutations.get_algorithms_and_oscillators_permutations(algo, feedback)
 
     @staticmethod
     def get_similar_preset(preset: np.ndarray, variation: int, learnable_indices: List[int], random_seed=0):
@@ -161,7 +161,7 @@ class DexedCharacteristics:
             return preset
         rng = np.random.default_rng((random_seed + 987654321 * variation))
         # First: change algorithm to a similar one
-        preset = synth.dexedpermutations.change_algorithm_to_similar(preset, variation, random_seed)
+        preset = dexedpermutations.change_algorithm_to_similar(preset, variation, random_seed)
         # Then: change a few learned parameters if variation > 1: algorithm is the hardest parameter to learn,
         # so we provide a special data augmentation for this parameter only.
         if variation == 1:

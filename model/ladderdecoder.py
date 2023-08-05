@@ -7,12 +7,12 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchinfo
 
-import utils.probability
-from model.ladderbase import LadderBase
-from model.presetmodel import PresetEmbedding
-from model.presetdecoder import PresetDecoder
-from model.convlayer import ConvBlock2D, UpsamplingResBlock, SelfAttentionConv2D, ResBlockBase
-from data.preset2d import Preset2dHelper
+from ..utils import probability
+from ..model.ladderbase import LadderBase
+from ..model.presetmodel import PresetEmbedding
+from ..model.presetdecoder import PresetDecoder
+from ..model.convlayer import ConvBlock2D, UpsamplingResBlock, SelfAttentionConv2D, ResBlockBase
+from ..data.preset2d import Preset2dHelper
 
 
 class LadderDecoder(LadderBase):
@@ -37,7 +37,7 @@ class LadderDecoder(LadderBase):
 
         # - - - - - 0) Output probability distribution helper class - - - - -
         if audio_proba_distribution.lower() == "gaussian_unitvariance":
-            self.audio_proba_distribution = utils.probability.GaussianUnitVariance(reduction='none')
+            self.audio_proba_distribution = probability.GaussianUnitVariance(reduction='none')
         else:
             raise ValueError("Unavailable audio probability distribution {}".format(audio_proba_distribution))
 

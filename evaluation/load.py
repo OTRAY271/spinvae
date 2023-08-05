@@ -7,9 +7,9 @@ import pickle
 
 import torch
 
-import config
-import data.build
-import model.hierarchicalvae
+from .. import config
+from ..data import build
+from ..model import hierarchicalvae
 
 
 class ModelLoader:
@@ -34,14 +34,14 @@ class ModelLoader:
             raise NotImplementedError()
         else:
             # Parts of train.py code
-            self.dataset = data.build.get_dataset(self.model_config, self.train_config)
-            dataloaders, dataloaders_nb_items = data.build.get_split_dataloaders(self.train_config, self.dataset)
+            self.dataset = build.get_dataset(self.model_config, self.train_config)
+            dataloaders, dataloaders_nb_items = build.get_split_dataloaders(self.train_config, self.dataset)
             self.dataloader = dataloaders[self.dataset_type]
             self.dataloader_num_items = dataloaders_nb_items[self.dataset_type]
 
         # Then build model and load its weights
         self.model_config.dim_z = -1  # Will be set by the hVAE itself
-        self.ae_model = model.hierarchicalvae.HierarchicalVAE(
+        self.ae_model = hierarchicalvae.HierarchicalVAE(
             self.model_config, self.train_config, self.dataset.preset_indexes_helper)
         self.ae_model.load_checkpoints(
             self.path_to_model_dir.joinpath("checkpoint.tar"), map_location=torch.device(device))

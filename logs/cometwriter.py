@@ -6,9 +6,9 @@ from comet_ml import Experiment  # Needs to be imported first
 
 import matplotlib.pyplot as plt
 
-import config
-from data.abstractbasedataset import AudioDataset
-from logs.metrics import LatentMetric
+from .. import config
+from ..data.abstractbasedataset import AudioDataset
+from ..logs.metrics import LatentMetric
 
 
 class CometWriter:

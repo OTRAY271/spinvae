@@ -8,9 +8,9 @@ import pandas as pd
 import seaborn as sns
 import warnings
 
-from evalconfig import InterpEvalConfig
-from evaluation.interpbase import InterpBase
-import utils.stat
+from ..evalconfig import InterpEvalConfig
+from ..evaluation.interpbase import InterpBase
+from ..utils import stat
 
 
 def interp_results_boxplots(
@@ -48,7 +48,7 @@ def interp_results_boxplots(
     # for each feature, compute normalisation factors from the 1st model, to be used for all models
     #   mean "without outliers" gives the best boxplots
     reference_results = models_interp_results[reference_model_idx]
-    reference_norm_factors = {k: utils.stat.means_without_outliers(results_df)
+    reference_norm_factors = {k: stat.means_without_outliers(results_df)
                               for k, results_df in reference_results.items()}
 
     # Detailed boxplots: each metric has its own subplots
@@ -91,9 +91,9 @@ def interp_results_boxplots(
             if display_wilcoxon_tests:
                 if not compact_display:
                     # p_value < 0.05 if model [1] has significantly LOWER values than model [0] (reference)
-                    p_values, has_improved = utils.stat.wilcoxon_test(
+                    p_values, has_improved = stat.wilcoxon_test(
                         models_interp_results[0][metric_name], models_interp_results[1][metric_name])
-                    p_values, has_deteriorated = utils.stat.wilcoxon_test(
+                    p_values, has_deteriorated = stat.wilcoxon_test(
                         models_interp_results[1][metric_name], models_interp_results[0][metric_name])
                     axes[metric_idx].set(
                         title="{} - Wilcoxon test: {}/{} improved, {}/{} deteriorated features"

@@ -11,13 +11,13 @@ from collections import OrderedDict
 import torch
 import torch.utils.data
 
-from data.abstractbasedataset import AudioDataset
-from data.nsynthdataset import NsynthDataset
-from data.surgedataset import SurgeDataset
-from synth import surge
-from data.dexeddataset import DexedDataset
+from ..data.abstractbasedataset import AudioDataset
+from ..data.nsynthdataset import NsynthDataset
+from ..data.surgedataset import SurgeDataset
+from ..synth import surge
+from ..data.dexeddataset import DexedDataset
 
-from data import sampler
+from ..data import sampler
 
 
 

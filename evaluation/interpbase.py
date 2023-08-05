@@ -17,14 +17,14 @@ import scipy.interpolate
 import scipy.stats
 import torch
 
-from data.preset2d import Preset2d
-from data.abstractbasedataset import PresetDataset
-import evaluation.load
-from evalconfig import InterpEvalConfig
-from evaluation.interpsequence import InterpSequence, LatentInterpSequence
-from utils.timbretoolbox import InterpolationTimbreToolbox
-import utils.stat
-import utils.math
+from ..data.preset2d import Preset2d
+from ..data.abstractbasedataset import PresetDataset
+from ..evaluation import load
+from ..evalconfig import InterpEvalConfig
+from ..evaluation.interpsequence import InterpSequence, LatentInterpSequence
+from ..utils.timbretoolbox import InterpolationTimbreToolbox
+from ..utils import stat
+from ..utils import math
 
 
 class InterpBase(ABC):
@@ -270,7 +270,7 @@ class InterpBase(ABC):
         for model_idx, interp_results in enumerate(models_interp_results):
             interp_config = eval_config.other_models[model_idx]
             # retrieve model hparams (train/model and interpolation hparams)
-            nn_model_config, nn_train_config = evaluation.load.ModelLoader.get_model_train_configs(
+            nn_model_config, nn_train_config = load.ModelLoader.get_model_train_configs(
                 interp_config['base_model_path'])
             nn_model_config_dict = {'mdlcfg__' + k: v for k, v in nn_model_config.__dict__.items()}
             nn_train_config_dict = {'trncfg__' + k: v for k, v in nn_train_config.__dict__.items()}
@@ -294,9 +294,9 @@ class InterpBase(ABC):
                 mean_variation_vs_ref = (model_interp_df.mean() - ref_interp_df.mean()) / ref_interp_df.mean()
                 mean_variation_vs_ref = mean_variation_vs_ref.values.mean()
                 # Wilcoxon test: which medians have significantly improved? (have been reduced significantly?)
-                improved_test_results = utils.stat.wilcoxon_test(ref_interp_df, model_interp_df)
+                improved_test_results = stat.wilcoxon_test(ref_interp_df, model_interp_df)
                 # Other test: which medians are now significantly higher?
-                deteriorated_test_results = utils.stat.wilcoxon_test(model_interp_df, ref_interp_df)
+                deteriorated_test_results = stat.wilcoxon_test(model_interp_df, ref_interp_df)
                 # Add everything to the dataframe
                 improvements_df.append({
                     'model': interp_config['model_interp_name'], 'metric': metric_name,
@@ -382,7 +382,7 @@ class NaivePresetInterpolation(InterpBase):
 
 class ModelBasedInterpolation(InterpBase):
     def __init__(
-            self, model_loader: Optional[evaluation.load.ModelLoader] = None, device='cpu', num_steps=7,
+            self, model_loader: Optional[load.ModelLoader] = None, device='cpu', num_steps=7,
             u_curve='linear', latent_interp_kind='linear', verbose=True,
             storage_path: Optional[pathlib.Path] = None, reference_storage_path: Optional[pathlib.Path] = None,
             verbose_postproc=True,
@@ -520,7 +520,7 @@ class ModelBasedInterpolation(InterpBase):
             )
             z_interpolated = interp_f(u_interpolated)
         elif self.latent_interp_kind == 'spherical':
-            sph_interpolator = utils.math.SphericalInterpolator(z_start_end[0, :], z_start_end[1, :])
+            sph_interpolator = math.SphericalInterpolator(z_start_end[0, :], z_start_end[1, :])
             z_interpolated = sph_interpolator(u_interpolated)
         else:
             raise AssertionError("latent interpolation '{}' not available".format(self.latent_interp_kind))

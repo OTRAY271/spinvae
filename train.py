@@ -24,19 +24,19 @@ import torch.optim
 import torch.profiler
 import torch.backends.cudnn
 
-import config
-import evalinterp
-import model.base
-import model.hierarchicalvae
-import logs.logger
-import logs.metrics
-from logs.metrics import SimpleMetric, EpochMetric, VectorMetric, LatentMetric, LatentCorrMetric
-import data.dataset
-import data.build
-import utils.profiling
-from utils.hparams import LinearDynamicParam
-import utils.figures
-import utils.exception
+from . import config
+from . import evalinterp
+from .model import base
+from .model import hierarchicalvae
+from .logs import logger
+from .logs import metrics
+from .logs.metrics import SimpleMetric, EpochMetric, VectorMetric, LatentMetric, LatentCorrMetric
+from .data import dataset
+from .data import build
+from .utils import profiling
+from .utils.hparams import LinearDynamicParam
+from .utils import figures
+from .utils import exception
 
 
 
@@ -60,33 +60,33 @@ def train_model(model_config: config.ModelConfig, train_config: config.TrainConf
 
     # ========== Logger init (required for comet.ml console logs, load from checkpoint, ...) and Config check ==========
     root_path = Path(__file__).resolve().parent
-    logger = logs.logger.RunLogger(root_path, model_config, train_config)
+    logger = logger.RunLogger(root_path, model_config, train_config)
 
 
     # ========== Datasets and DataLoaders ==========
     pretrain_audio = train_config.pretrain_audio_only  # type: bool
     if pretrain_audio:
-        train_audio_dataset, validation_audio_dataset = data.build.get_pretrain_datasets(model_config, train_config)
+        train_audio_dataset, validation_audio_dataset = build.get_pretrain_datasets(model_config, train_config)
         # dataloader is a dict of 2 dataloaders ('train' and 'validation')
-        dataloader, dataloaders_nb_items = data.build.get_pretrain_dataloaders(
+        dataloader, dataloaders_nb_items = build.get_pretrain_dataloaders(
             model_config, train_config, train_audio_dataset, validation_audio_dataset)
         preset_helper = None
     else:
         # Must be constructed first because dataset output sizes will be required to automatically
         # infer models output sizes.
-        dataset = data.build.get_dataset(model_config, train_config)
+        dataset = build.get_dataset(model_config, train_config)
         # We use a single dataset (for train, valid, test) but different dataloaders
         train_audio_dataset, validation_audio_dataset = dataset, dataset
         preset_helper = dataset.preset_indexes_helper
         # dataloader is a dict of 3 subsets dataloaders ('train', 'validation' and 'test')
         # This function will make copies of the original dataset (some with, some without data augmentation)
-        dataloader, dataloaders_nb_items = data.build.get_split_dataloaders(train_config, dataset)
+        dataloader, dataloaders_nb_items = build.get_split_dataloaders(train_config, dataset)
 
 
     # ================== Model definition - includes Losses, Optimizers, Schedulers ===================
     #                            (requires the full_dataset to be built)
     # HierarchicalVAE won't be the same during pre-train (empty parts without optimizer and scheduler)
-    ae_model = model.hierarchicalvae.HierarchicalVAE(model_config, train_config, preset_helper)
+    ae_model = hierarchicalvae.HierarchicalVAE(model_config, train_config, preset_helper)
     # will torchinfo txt summary. model must not be parallel (graph not written anymore: too complicated, unreadable)
     logger.init_with_model(ae_model, model_config.input_audio_tensor_size, write_graph=False)
 
@@ -170,7 +170,7 @@ def train_model(model_config: config.ModelConfig, train_config: config.TrainConf
 
 
     # ========== PyTorch Profiling (optional) ==========
-    optional_profiler = utils.profiling.OptionalProfiler(train_config, logger.tensorboard_run_dir)
+    optional_profiler = profiling.OptionalProfiler(train_config, logger.tensorboard_run_dir)
 
 
     # ========== Model training epochs ==========
@@ -194,7 +194,7 @@ def train_model(model_config: config.ModelConfig, train_config: config.TrainConf
             for i in range(len(dataloader['train'])):
                 minibatch = next(dataloader_iter)
                 x_in, v_in, uid, notes, label = [m.to(device) for m in minibatch]
-                model.hierarchicalvae.process_minibatch(
+                hierarchicalvae.process_minibatch(
                     ae_model, ae_model_parallel, device,
                     x_in, v_in, uid, notes, label,
                     epoch, scalars, super_metrics
@@ -213,7 +213,7 @@ def train_model(model_config: config.ModelConfig, train_config: config.TrainConf
                 i_to_plot = np.random.default_rng(seed=epoch).integers(0, len(dataloader['validation'])-1)
                 for i, minibatch in enumerate(dataloader['validation']):
                     x_in, v_in, uid, notes, label = [m.to(device) for m in minibatch]
-                    ae_out_audio, ae_out_preset = model.hierarchicalvae.process_minibatch(
+                    ae_out_audio, ae_out_preset = hierarchicalvae.process_minibatch(
                         ae_model, ae_model_parallel, device,
                         x_in, v_in, uid, notes, label,
                         epoch, scalars, super_metrics
@@ -245,7 +245,7 @@ def train_model(model_config: config.ModelConfig, train_config: config.TrainConf
             # TODO also thread this one (30s plot... !!!!)
             if len(v_in_backup) > 0 and not pretrain_audio:
                 v_in_backup, v_out_backup = torch.cat(v_in_backup), torch.cat(v_out_backup)
-                fig, _ = utils.figures.plot_preset2d_batch_error(
+                fig, _ = figures.plot_preset2d_batch_error(
                     v_out_backup.detach().cpu(), v_in_backup.detach().cpu(), preset_helper)
                 logger.add_figure('PresetError/Validation', fig)
 

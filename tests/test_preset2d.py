@@ -3,10 +3,10 @@ import unittest
 
 import numpy as np
 
-import config
-import data.dataset
-from data.dataset import DexedDataset
-from data.preset2d import Preset2dHelper, Preset2d
+from .. import config
+from ..data import dataset
+from ..data.dataset import DexedDataset
+from ..data.preset2d import Preset2dHelper, Preset2d
 
 
 """
@@ -33,7 +33,7 @@ class Presets2dTest(unittest.TestCase):
         model_config, train_config = config.ModelConfig(), config.TrainConfig()
         config.update_dynamic_config_params(model_config, train_config)
         dexed_dataset = DexedDataset(
-            **data.dataset.model_config_to_dataset_kwargs(model_config),
+            **dataset.model_config_to_dataset_kwargs(model_config),
             check_constrains_consistency=False
         )
         for uid in dexed_dataset.valid_preset_UIDs:

@@ -17,10 +17,10 @@ import torch.utils
 import soundfile
 import numpy as np
 
-from synth import dexed
-from data import abstractbasedataset  # 'from .' raises ImportError when run from PyCharm as __main__
+from ..synth import dexed
+from ..data import abstractbasedataset  # 'from .' raises ImportError when run from PyCharm as __main__
 # from data.preset import DexedPresetsParams, PresetIndexesHelper  # Deprecated now
-from data.preset2d import Preset2dHelper, Preset2d
+from ..data.preset2d import Preset2dHelper, Preset2d
 
 
 # Global lock... Should be the same for all forked Unix processes

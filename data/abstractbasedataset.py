@@ -23,7 +23,7 @@ import torch.utils
 import torch.utils.data
 import numpy as np
 
-import utils.torchspectrograms
+from ..utils import torchspectrograms
 
 # See https://github.com/pytorch/audio/issues/903
 # torchaudio.set_audio_backend("sox_io")
@@ -96,10 +96,10 @@ class AudioDataset(torch.utils.data.Dataset, ABC):
         self.valid_preset_UIDs = np.zeros((0,))  # UIDs (may be indexes) of valid presets for this dataset
         # - - - Spectrogram utility class - - -
         if self.n_mel_bins <= 0:
-            self.compute_spectrogram = utils.torchspectrograms\
+            self.compute_spectrogram = torchspectrograms\
                 .Spectrogram(self.n_fft, self.fft_hop, spectrogram_min_dB)
         else:  # FIXME actually implement mel f min/max
-            self.compute_spectrogram = utils.torchspectrograms\
+            self.compute_spectrogram = torchspectrograms\
                 .MelSpectrogram(self.n_fft, self.fft_hop, spectrogram_min_dB, self.n_mel_bins, self.Fs)
         # spectrogram min/max/mean/std statistics: must be loaded after super() ctor (depend on child class args)
         self.spectrogram_normalization = spectrogram_normalization
