@@ -70,7 +70,7 @@ class Preset2dHelper:
                 self.fixed_vst_indices.append(vst_idx)
         # Default VST param values: precompute a bool mask array and store the default values
         self.fixed_vst_params_bool_mask = np.zeros((ds.total_nb_vst_params, ), dtype=bool)
-        self.fixed_vst_params_default_values = -1.0 * np.ones((len(self.fixed_vst_indices, )), dtype=np.float)
+        self.fixed_vst_params_default_values = -1.0 * np.ones((len(self.fixed_vst_indices, )), dtype=float)
         for i, vst_idx in enumerate(self.fixed_vst_indices):
             self.fixed_vst_params_bool_mask[vst_idx] = True
             self.fixed_vst_params_default_values[i] = ds.params_default_values[vst_idx]
