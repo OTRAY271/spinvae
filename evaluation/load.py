@@ -35,9 +35,9 @@ class ModelLoader:
         else:
             # Parts of train.py code
             self.dataset = build.get_dataset(self.model_config, self.train_config)
-            dataloaders, dataloaders_nb_items = build.get_split_dataloaders(self.train_config, self.dataset)
-            self.dataloader = dataloaders[self.dataset_type]
-            self.dataloader_num_items = dataloaders_nb_items[self.dataset_type]
+            # dataloaders, dataloaders_nb_items = build.get_split_dataloaders(self.train_config, self.dataset)
+            # self.dataloader = dataloaders[self.dataset_type]
+            # self.dataloader_num_items = dataloaders_nb_items[self.dataset_type]
 
         # Then build model and load its weights
         self.model_config.dim_z = -1  # Will be set by the hVAE itself
@@ -51,10 +51,13 @@ class ModelLoader:
 
     @staticmethod
     def get_model_train_configs(model_dir: Path):
-        with open(model_dir.joinpath("config.pickle"), 'rb') as f:
-            checkpoint_configs = pickle.load(f)
-        model_config: config.ModelConfig = checkpoint_configs['model']
-        train_config: config.TrainConfig = checkpoint_configs['train']
+        # with open(model_dir.joinpath("config.pickle"), 'rb') as f:
+        #     checkpoint_configs = pickle.load(f)
+        # model_config: config.ModelConfig = checkpoint_configs['model']
+        # train_config: config.TrainConfig = checkpoint_configs['train']
+        model_config: config.ModelConfig = config.ModelConfig()
+        train_config: config.TrainConfig = config.TrainConfig()
+        config.update_dynamic_config_params(model_config, train_config)
         return model_config, train_config
 
 

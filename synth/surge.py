@@ -11,7 +11,7 @@ import sys
 from typing import List, Dict
 
 sys.path.append( "/home/gwendal/Jupyter/AudioPlugins/surge_build" )
-import surgepy  # Must be properly built and available from the folder above
+# import surgepy  # Must be properly built and available from the folder above
 
 import numpy as np
 import pathlib

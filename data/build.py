@@ -12,7 +12,7 @@ import torch.utils.data
 from torch.utils.data import DataLoader
 
 from . import dataset
-from .. import sampler
+from . import sampler
 
 
 def get_dataset(model_config, train_config):
@@ -69,7 +69,7 @@ def get_split_dataloaders(train_config, full_dataset,
     dataloaders = dict()
     sub_datasets_lengths = dict()
     batch_size = train_config.minibatch_size
-    for k, sampler in subset_samplers.items():
+    for k, subset_sampler in subset_samplers.items():
         # Last train minibatch must be dropped to help prevent training instability. Worst case example, last minibatch
         # contains only 8 elements, mostly sfx: these hard to learn (or generate) item would have a much higher
         # equivalent learning rate because all losses are minibatch-size normalized. No issue for eval though
@@ -78,14 +78,14 @@ def get_split_dataloaders(train_config, full_dataset,
         ds._data_augmentation = (k.lower() == 'train')
         # Dataloaders based on previously built samplers (don't need to set shuffle to True)
         dataloaders[k] = torch.utils.data.DataLoader(ds, batch_size=batch_size, drop_last=drop_last,
-                                                     sampler=sampler, num_workers=num_workers,
+                                                     sampler=subset_sampler, num_workers=num_workers,
                                                      pin_memory=train_config.dataloader_pin_memory,
                                                      persistent_workers=((num_workers > 0) and persistent_workers))
         # actual nb of dataloader items length depends on drop last, or not
         if drop_last:
-            sub_datasets_lengths[k] = (len(sampler.indices) // batch_size) * batch_size
+            sub_datasets_lengths[k] = (len(subset_sampler.indices) // batch_size) * batch_size
         else:
-            sub_datasets_lengths[k] = len(sampler.indices)
+            sub_datasets_lengths[k] = len(subset_sampler.indices)
         if train_config.verbosity >= 1:
             print("[data/build.py] Dataset '{}' contains {}/{} samples ({:.1f}%). num_workers={}"
                   .format(k, sub_datasets_lengths[k], len(full_dataset),

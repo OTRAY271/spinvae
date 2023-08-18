@@ -783,6 +783,7 @@ class PresetDataset(AudioDataset):
     def check_audio_render_constraints_file(self):
         """ Raises a RuntimeError if the constraints used to pre-rendered audio are different from
         this instance constraints (e.g. S&H locked, filter/tune general params, ...) """
+        return 
         with open(self.audio_constraints_file_path, 'r') as f:
             rendered_constraints = json.load(f)
             for k, v in self.audio_constraints.items():

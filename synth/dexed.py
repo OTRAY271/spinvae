@@ -26,7 +26,7 @@ import io
 import pandas as pd
 
 from ..synth import dexedbase
-import librenderman as rm  # A symbolic link to the actual librenderman.so must be found in the current folder
+# import librenderman as rm  # A symbolic link to the actual librenderman.so must be found in the current folder
 
 from ..utils import text
 
@@ -104,7 +104,7 @@ class PresetDatabaseABC(ABC):
     @staticmethod
     def get_params_in_plugin_format(params: Iterable):
         """ Converts a 1D array of param values into an list of (idx, param_value) tuples """
-        preset_values = np.asarray(params, dtype=np.double)  # np.float32 is not valid for RenderMan
+        preset_values = np.asarray(params, dtype=float)  # np.float32 is not valid for RenderMan
         # Dexed parameters are nicely ordered from 0 to 154
         return [(i, preset_values[i]) for i in range(preset_values.shape[0])]
 

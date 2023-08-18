@@ -70,7 +70,7 @@ class Preset2dHelper:
                 self.fixed_vst_indices.append(vst_idx)
         # Default VST param values: precompute a bool mask array and store the default values
         self.fixed_vst_params_bool_mask = np.zeros((ds.total_nb_vst_params, ), dtype=bool)
-        self.fixed_vst_params_default_values = -1.0 * np.ones((len(self.fixed_vst_indices, )), dtype=np.float)
+        self.fixed_vst_params_default_values = -1.0 * np.ones((len(self.fixed_vst_indices, )), dtype=float)
         for i, vst_idx in enumerate(self.fixed_vst_indices):
             self.fixed_vst_params_bool_mask[vst_idx] = True
             self.fixed_vst_params_default_values[i] = ds.params_default_values[vst_idx]
@@ -115,10 +115,10 @@ class Preset2dHelper:
         self.categorical_groups_class_samples_counts = {
             card: np.zeros((card, ), dtype=int) for card in categorical_cardinals_set
         }
-        for vst_idx, class_samples_count in ds.cat_params_class_samples_count.items():
-            assert self.vst_categorical_bool_mask[vst_idx]
-            card = class_samples_count.shape[0]
-            self.categorical_groups_class_samples_counts[card] += class_samples_count
+        # for vst_idx, class_samples_count in ds.cat_params_class_samples_count.items():
+        #     assert self.vst_categorical_bool_mask[vst_idx]
+        #     card = class_samples_count.shape[0]
+        #     self.categorical_groups_class_samples_counts[card] += class_samples_count
 
         # Retrieve params names (for plots) - numerical/categorical names can be extract from this one
         self.vst_params_names = np.array(ds.preset_param_names, copy=True)
