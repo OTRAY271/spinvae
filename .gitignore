@@ -1,5 +1,5 @@
 # Confidential files - not to be published
-utils/config_confidential.py
+# utils/config_confidential.py
 
 # Python/IPython
 *.pyc
